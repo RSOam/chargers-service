@@ -7,9 +7,10 @@ on:
 
 jobs:
   test:
-    matrix:
-      go-version: [1.17.x]
-      platform: [ubuntu-latest]
+    strategy:
+      matrix:
+        go-version: [1.17.x]
+        platform: [ubuntu-latest]
 
     runs-on: ${{ matrix.platform }}
 
