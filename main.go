@@ -70,6 +70,8 @@ func main() {
 		handler := chargers.NewHttpServer(ctx2, endpoints)
 		errs <- http.ListenAndServe(*httpAddr, handler)
 	}()
-
 	level.Error(logger).Log("exit", <-errs)
+}
+func test() string {
+	return "Ok"
 }
