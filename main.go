@@ -25,7 +25,7 @@ func main() {
 		logger = log.NewLogfmtLogger(os.Stderr)
 		logger = log.NewSyncLogger(logger)
 		logger = log.With(logger,
-			"service", "account",
+			"service", "chargers",
 			"time:", log.DefaultTimestampUTC,
 			"caller", log.DefaultCaller,
 		)
@@ -39,6 +39,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	level.Info(logger).Log("msg", "DB Connected")
 	defer func() {
 		if err = client.Disconnect(ctx); err != nil {

@@ -12,7 +12,7 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 
-	r.Methods("POST").Path("/chargers/").Handler(ht.NewServer(
+	r.Methods("POST").Path("/chargers").Handler(ht.NewServer(
 		endpoints.CreateCharger,
 		decodeCreateChargerRequest,
 		encodeResponse,
@@ -21,6 +21,16 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	r.Methods("GET").Path("/chargers/{id}").Handler(ht.NewServer(
 		endpoints.GetCharger,
 		decodeGetChargerRequest,
+		encodeResponse,
+	))
+	r.Methods("GET").Path("/chargers").Handler(ht.NewServer(
+		endpoints.GetChargers,
+		decodeGetChargersRequest,
+		encodeResponse,
+	))
+	r.Methods("DELETE").Path("/chargers/{id}").Handler(ht.NewServer(
+		endpoints.DeleteCharger,
+		decodeDeleteChargerRequest,
 		encodeResponse,
 	))
 	return r

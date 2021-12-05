@@ -2,9 +2,10 @@ package chargers
 
 import (
 	"context"
+	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 )
 
 type service struct {
@@ -19,10 +20,17 @@ func NewService(db ChargerDB, logger log.Logger) ChargersService {
 	}
 }
 
-func (s service) CreateCharger(ctx context.Context, name string) (string, error) {
+func (s service) CreateCharger(ctx context.Context, name string, location Location) (string, error) {
 	logger := log.With(s.logger, "method: ", "CreateCharger")
 	charger := Charger{
-		Name: name,
+		Name:          name,
+		Location:      location,
+		AverageRating: 0.0,
+		Ratings:       []Rating{},
+		Comments:      []Comment{},
+		Reservations:  []Reservation{},
+		Created:       time.Now().Format(time.RFC3339),
+		Modified:      time.Now().Format(time.RFC3339),
 	}
 	if err := s.db.CreateCharger(ctx, charger); err != nil {
 		level.Error(logger).Log("err", err)
@@ -40,4 +48,24 @@ func (s service) GetCharger(ctx context.Context, id string) (Charger, error) {
 	}
 	logger.Log("Get Charger", id)
 	return charger, nil
+}
+func (s service) GetChargers(ctx context.Context) ([]Charger, error) {
+	logger := log.With(s.logger, "method", "GetChargers")
+	chargers, err := s.db.GetChargers(ctx)
+	if err != nil {
+		level.Error(logger).Log("err", err)
+		return chargers, err
+	}
+	logger.Log("Get Chargers")
+	return chargers, nil
+}
+func (s service) DeleteCharger(ctx context.Context, id string) (string, error) {
+	logger := log.With(s.logger, "method", "DeleteCharger")
+	err := s.db.DeleteCharger(ctx, id)
+	if err != nil {
+		level.Error(logger).Log("err", err)
+		return "", err
+	}
+	logger.Log("Delete Charger", id)
+	return "Ok", nil
 }
