@@ -36,6 +36,8 @@ jobs:
     needs: [test]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     steps:
+      - name: set env
+        run: echo "::set-env name=NOW::$(date +'%Y-%m-%dT%H:%M:%S')"
       -
         name: Checkout code
         uses: actions/checkout@v2
@@ -60,4 +62,4 @@ jobs:
             DBpw_arg=${{ secrets.DB_PW }}
           cache-from: type=registry,ref=almarkdev/chargers-service:latest
           cache-to: type=inline  
-          tags: almarkdev/chargers-service:`date`
+          tags: almarkdev/chargers-service:${{ env.NOW }}
