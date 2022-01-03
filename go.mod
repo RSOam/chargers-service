@@ -11,10 +11,12 @@ require (
 require (
 	github.com/armon/go-metrics v0.3.9 // indirect
 	github.com/fatih/color v1.12.0 // indirect
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/hashicorp/consul/api v1.12.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v0.16.2 // indirect

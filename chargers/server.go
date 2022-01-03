@@ -5,13 +5,19 @@ import (
 	"net/http"
 
 	ht "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func NewHttpServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
-
+	cors := handlers.CORS(
+		handlers.AllowedHeaders([]string{"content-type"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowCredentials(),
+	)
+	r.Use(cors)
 	r.Methods("POST").Path("/chargers").Handler(ht.NewServer(
 		endpoints.CreateCharger,
 		decodeCreateChargerRequest,
