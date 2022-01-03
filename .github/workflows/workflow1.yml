@@ -36,8 +36,12 @@ jobs:
     needs: [test]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     steps:
-      - name: set env
-        run: echo "NOW=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.0
+        with:
+          timeZone: 1
+          format: 'YYYY-MM-DD-HH-mm-ss'
       -
         name: Checkout code
         uses: actions/checkout@v2
@@ -62,4 +66,4 @@ jobs:
             DBpw_arg=${{ secrets.DB_PW }}
           cache-from: type=registry,ref=almarkdev/chargers-service:latest
           cache-to: type=inline  
-          tags: almarkdev/chargers-service:${{ env.NOW }}
+          tags: almarkdev/chargers-service:${{ steps.time.outputs.time }}
