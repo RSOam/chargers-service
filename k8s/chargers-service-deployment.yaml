@@ -18,8 +18,8 @@ spec:
           env:
           - name: HOST_IP
             valueFrom:
-              fieldRed:
-                apiVersion: 1
+              fieldRef:
+                apiVersion: v1
                 fieldPath: status.hostIP
           - name: CONSUL_ADDR
             value: http://$(HOST_IP):8500
