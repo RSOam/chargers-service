@@ -44,8 +44,8 @@ type Reservation struct {
 	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	ChargerID primitive.ObjectID `json:"chargerID"`
 	UserID    primitive.ObjectID `json:"userID"`
-	From      float64            `json:"from"`
-	To        float64            `json:"to"`
+	From      string             `json:"from"`
+	To        string             `json:"to"`
 	Created   string             `json:"created"`
 	Modified  string             `json:"modified"`
 }
@@ -54,5 +54,6 @@ type ChargerDB interface {
 	CreateCharger(ctx context.Context, charger Charger) error
 	GetCharger(ctx context.Context, id string) (Charger, error)
 	GetChargers(ctx context.Context) ([]Charger, error)
+	UpdateCharger(ctx context.Context, id string, charger Charger) error
 	DeleteCharger(ctx context.Context, id string) error
 }

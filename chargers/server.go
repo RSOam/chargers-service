@@ -17,7 +17,11 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints) http.Handler {
 		decodeCreateChargerRequest,
 		encodeResponse,
 	))
-
+	r.Methods("PUT").Path("/chargers/{id}").Handler(ht.NewServer(
+		endpoints.UpdateCharger,
+		decodeUpdateChargerRequest,
+		encodeResponse,
+	))
 	r.Methods("GET").Path("/chargers/{id}").Handler(ht.NewServer(
 		endpoints.GetCharger,
 		decodeGetChargerRequest,

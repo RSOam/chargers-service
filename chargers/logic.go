@@ -6,17 +6,20 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	consulapi "github.com/hashicorp/consul/api"
 )
 
 type service struct {
 	db     ChargerDB
 	logger log.Logger
+	consul consulapi.Client
 }
 
-func NewService(db ChargerDB, logger log.Logger) ChargersService {
+func NewService(db ChargerDB, logger log.Logger, consul consulapi.Client) ChargersService {
 	return &service{
 		db:     db,
 		logger: logger,
+		consul: consul,
 	}
 }
 
@@ -37,6 +40,25 @@ func (s service) CreateCharger(ctx context.Context, name string, location Locati
 		return "", err
 	}
 	logger.Log("create Charger", nil)
+	return "Ok", nil
+}
+func (s service) UpdateCharger(ctx context.Context, id string, name string, location Location, rating float64) (string, error) {
+	logger := log.With(s.logger, "method: ", "UpdateCharger")
+	charger := Charger{
+		Name:          name,
+		Location:      location,
+		AverageRating: rating,
+		Ratings:       []Rating{},
+		Comments:      []Comment{},
+		Reservations:  []Reservation{},
+		Created:       time.Now().Format(time.RFC3339),
+		Modified:      time.Now().Format(time.RFC3339),
+	}
+	if err := s.db.UpdateCharger(ctx, id, charger); err != nil {
+		level.Error(logger).Log("err", err)
+		return "", err
+	}
+	logger.Log("update Charger", nil)
 	return "Ok", nil
 }
 func (s service) GetCharger(ctx context.Context, id string) (Charger, error) {

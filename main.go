@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/RSOam/chargers-service/chargers"
-
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	consulapi "github.com/hashicorp/consul/api"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -35,7 +35,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://amAdmin:"+os.Getenv("DBpw")+"@cluster0.4lsbm.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://amAdmin:"+os.Getenv("DBpw")+"@cluster0.4lsbm.mongodb.net/Chargers?retryWrites=true&w=majority"))
 	if err != nil {
 		panic(err)
 	}
@@ -46,14 +46,22 @@ func main() {
 			panic(err)
 		}
 	}()
-	collection := client.Database("RSOam")
+	//CONSUL
+	consulClient, err := getConsulClient(os.Getenv("CONSUL_ADDR"))
+	if err != nil {
+		panic(err)
+	}
+	level.Info(logger).Log("msg", "Consul Connected")
+
+	//
+	collection := client.Database("Chargers")
 
 	flag.Parse()
 	ctx2 := context.Background()
 	var srv chargers.ChargersService
 	{
-		database := chargers.NewDatabase(collection, logger)
-		srv = chargers.NewService(database, logger)
+		database := chargers.NewDatabase(collection, logger, *consulClient)
+		srv = chargers.NewService(database, logger, *consulClient)
 	}
 
 	errs := make(chan error)
@@ -75,4 +83,11 @@ func main() {
 }
 func test() string {
 	return "Ok"
+}
+func getConsulClient(address string) (*consulapi.Client, error) {
+	config := consulapi.DefaultConfig()
+	config.Address = address
+	consul, err := consulapi.NewClient(config)
+	return consul, err
+
 }

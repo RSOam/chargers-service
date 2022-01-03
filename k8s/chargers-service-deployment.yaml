@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chargers-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chargers-service
+  template:
+    metadata:
+      labels:
+        app: chargers-service
+    spec:
+      containers:
+        - image: almarkdev/chargers-service:latest
+          name: chargers-service
+          env:
+          - name: HOST_IP
+            valueFrom:
+              fieldRed:
+                apiVersion: 1
+                fieldPath: status.hostIP
+          - name: CONSUL_ADDR
+            value: http://$(HOST_IP):8500
+          ports:
+            - containerPort: 8080
+              name: server
+              protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: chargers-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: server
+  selector:
+    app: chargers-service

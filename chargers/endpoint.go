@@ -10,6 +10,7 @@ type Endpoints struct {
 	CreateCharger endpoint.Endpoint
 	GetCharger    endpoint.Endpoint
 	GetChargers   endpoint.Endpoint
+	UpdateCharger endpoint.Endpoint
 	DeleteCharger endpoint.Endpoint
 }
 
@@ -18,6 +19,7 @@ func MakeEndpoints(s ChargersService) Endpoints {
 		CreateCharger: makeCreateChargerEndpoint(s),
 		GetCharger:    makeGetChargerEndpoint(s),
 		GetChargers:   makeGetChargersEndpoint(s),
+		UpdateCharger: makeUpdateChargerEndpoint(s),
 		DeleteCharger: makeDeleteChargerEndpoint(s),
 	}
 }
@@ -58,5 +60,12 @@ func makeDeleteChargerEndpoint(s ChargersService) endpoint.Endpoint {
 		return DeleteChargerResponse{
 			Status: status,
 		}, err
+	}
+}
+func makeUpdateChargerEndpoint(s ChargersService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(UpdateChargerRequest)
+		status, err := s.UpdateCharger(ctx, req.Id, req.Name, req.Location, req.AverageRating)
+		return UpdateChargerResponse{Status: status}, err
 	}
 }

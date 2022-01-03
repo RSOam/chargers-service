@@ -32,11 +32,36 @@ type (
 	GetChargersResponse struct {
 		Chargers []Charger `json:"chargers"`
 	}
+	UpdateChargerRequest struct {
+		Id            string   `json:"id"`
+		Name          string   `json:"name"`
+		Location      Location `json:"location"`
+		AverageRating float64  `json:"averageRating"`
+	}
+	UpdateChargerResponse struct {
+		Status string `json:"status"`
+	}
 	DeleteChargerRequest struct {
 		Id string `json:"id"`
 	}
 	DeleteChargerResponse struct {
 		Status string `json:"status"`
+	}
+	//OTHER
+	GetChargerRatingsRequest struct {
+	}
+	GetChargerRatingsResponse struct {
+		Ratings []Rating `json:"ratings"`
+	}
+	GetChargerCommentsRequest struct {
+	}
+	GetChargerCommentsResponse struct {
+		Comments []Comment `json:"comments"`
+	}
+	GetChargerReservationsRequest struct {
+	}
+	GetChargerReservationsResponse struct {
+		Reservations []Reservation `json:"reservations"`
 	}
 )
 
@@ -50,6 +75,16 @@ func decodeCreateChargerRequest(ctx context.Context, r *http.Request) (interface
 	if err != nil {
 		return nil, err
 	}
+	return req, nil
+}
+func decodeUpdateChargerRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	req := UpdateChargerRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
+	}
+	vals := mux.Vars(r)
+	req.Id = vals["id"]
 	return req, nil
 }
 func decodeGetChargerRequest(ctx context.Context, r *http.Request) (interface{}, error) {
