@@ -37,7 +37,7 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     steps:
       - name: set env
-        run: echo "::set-env name=NOW::$(date +'%Y-%m-%dT%H:%M:%S')"
+        run: echo "NOW=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
       -
         name: Checkout code
         uses: actions/checkout@v2
