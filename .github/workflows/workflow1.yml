@@ -60,4 +60,4 @@ jobs:
             DBpw_arg=${{ secrets.DB_PW }}
           cache-from: type=registry,ref=almarkdev/chargers-service:latest
           cache-to: type=inline  
-          tags: almarkdev/chargers-service:latest
+          tags: almarkdev/chargers-service:`date`
