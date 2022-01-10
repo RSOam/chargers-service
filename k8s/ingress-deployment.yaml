@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: proxy-ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: azure/application-gateway
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
@@ -11,22 +11,72 @@ spec:
     - http:
         paths:
           - path: /chargers
+            pathType: Prefix
             backend:
-              serviceName: chargers-service
-              servicePort: 8080
+              service:
+                name: chargers-service
+                port: 
+                  number: 8080
+          - path: /chargers/*
+            pathType: Prefix
+            backend:
+              service:
+                name: chargers-service
+                port: 
+                  number: 8080
           - path: /comments
+            pathType: Prefix
             backend:
-              serviceName: comments-and-ratings-service
-              servicePort: 8080    
+              service:
+                name: comments-and-ratings-service
+                port: 
+                    number: 8080   
+          - path: /comments/*
+            pathType: Prefix
+            backend:
+              service:
+                name: comments-and-ratings-service
+                port: 
+                    number: 8080  
           - path: /ratings
+            pathType: Prefix
             backend:
-              serviceName: comments-and-ratings-service
-              servicePort: 8080
+              service:
+                name: comments-and-ratings-service
+                port: 
+                  number: 8080
+          - path: /ratings/*
+            pathType: Prefix
+            backend:
+              service:
+                name: comments-and-ratings-service
+                port: 
+                  number: 8080
           - path: /users
+            pathType: Prefix
             backend:
-              serviceName: users-service
-              servicePort: 8080     
+              service:
+                name: users-service
+                port: 
+                  number: 8080
+          - path: /users/*
+            pathType: Prefix
+            backend:
+              service:
+                name: users-service
+                port: 
+                  number: 8080
           - path: /reservations
+            pathType: Prefix
             backend:
-              serviceName: reservations-service
-              servicePort: 8080  
+              service:
+                name: reservations-service
+                port: 
+                  number: 8080           
+          - path: /reservations/*
+            pathType: Prefix
+            backend:
+              service:
+                name: reservations-service
+                port: 
+                  number: 8080 

@@ -38,6 +38,8 @@ func (dat *database) CreateCharger(ctx context.Context, charger Charger) error {
 	}
 	return nil
 }
+
+/*
 func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error) {
 	tempCharger := Charger{}
 	objectID, err := primitive.ObjectIDFromHex(id)
@@ -46,7 +48,6 @@ func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error)
 		dat.logger.Log("Error getting charger from DB: ", err.Error())
 		return tempCharger, err
 	}
-
 	val, _ := getConsulValue(dat.consul, dat.logger, "commratService")
 	val2, _ := getConsulValue(dat.consul, dat.logger, "reservationsService")
 	ratings, err := getChargerRatings(val, dat.logger, id)
@@ -77,6 +78,62 @@ func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error)
 
 	return tempCharger, nil
 }
+*/
+
+func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error) {
+	//ASYNC
+	tempCharger := Charger{}
+	objectID, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		dat.logger.Log("Error getting charger from DB: ", err.Error())
+		return tempCharger, err
+	}
+	ratChan := make(chan RatResult)
+	comChan := make(chan ComResult)
+	resChan := make(chan ResResult)
+	val, _ := getConsulValue(dat.consul, dat.logger, "commratService")
+	val2, _ := getConsulValue(dat.consul, dat.logger, "reservationsService")
+
+	go getChargerRatingsAsync(val, dat.logger, id, ratChan)
+	dat.logger.Log("Async getting chargers")
+	go getChargerCommentsAsync(val, dat.logger, id, comChan)
+	dat.logger.Log("Async getting comments")
+	go getChargerReservationsAsync(val2, dat.logger, id, resChan)
+	dat.logger.Log("Async getting reservations")
+
+	ratRes := <-ratChan
+	dat.logger.Log("Async got chargers")
+	if ratRes.err != nil {
+		dat.logger.Log("Error getting charger from DB: ", ratRes.err.Error())
+		return tempCharger, ratRes.err
+	}
+	comRes := <-comChan
+	dat.logger.Log("Async got comments")
+	if err != nil {
+		dat.logger.Log("Error getting charger from DB: ", comRes.err.Error())
+		return tempCharger, comRes.err
+	}
+	resRes := <-resChan
+	dat.logger.Log("Async got reservations")
+	if resRes.err != nil {
+		dat.logger.Log("Error getting charger from DB: ", resRes.err.Error())
+		return tempCharger, resRes.err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err = dat.db.Collection("Chargers").FindOne(ctx, bson.M{"_id": objectID}).Decode(&tempCharger)
+	if err != nil {
+		dat.logger.Log("Error getting charger from DB: ", err.Error())
+		return tempCharger, err
+	}
+	tempCharger.Ratings = ratRes.ratings
+	tempCharger.Comments = comRes.comments
+	tempCharger.Reservations = resRes.reservations
+	return tempCharger, nil
+}
+
 func (dat *database) DeleteCharger(ctx context.Context, id string) error {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -167,6 +224,53 @@ func getChargerRatings(commratAddr string, logger log.Logger, chargerID string) 
 	client.CloseIdleConnections()
 	return tempRatings, nil
 }
+
+type RatResult struct {
+	ratings []Rating
+	err     error
+}
+
+func getChargerRatingsAsync(commratAddr string, logger log.Logger, chargerID string, response chan RatResult) {
+	requestBody, err := json.Marshal(GetChargerRatingsRequest{})
+	tempResponse := GetChargerRatingsResponse{}
+	tempRatings := []Rating{}
+	tempRR := RatResult{}
+	if err != nil {
+		tempRR.ratings = tempRatings
+		tempRR.err = err
+		response <- tempRR
+	}
+	client := &http.Client{}
+
+	commratUri := commratAddr + "/ratings/"
+	req, err := http.NewRequest(http.MethodGet, commratUri+"?charger="+chargerID, bytes.NewBuffer(requestBody))
+	if err != nil {
+		tempRR.ratings = tempRatings
+		tempRR.err = err
+		response <- tempRR
+	}
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		tempRR.ratings = tempRatings
+		tempRR.err = err
+		response <- tempRR
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&tempResponse)
+
+	tempRatings = tempResponse.Ratings
+	if err != nil {
+		tempRR.ratings = tempRatings
+		tempRR.err = err
+		response <- tempRR
+	}
+	client.CloseIdleConnections()
+	tempRR.ratings = tempRatings
+	tempRR.err = nil
+	response <- tempRR
+}
 func getChargerComments(commratAddr string, logger log.Logger, chargerID string) ([]Comment, error) {
 	requestBody, err := json.Marshal(GetChargerCommentsRequest{})
 	tempResponse := GetChargerCommentsResponse{}
@@ -196,6 +300,52 @@ func getChargerComments(commratAddr string, logger log.Logger, chargerID string)
 	client.CloseIdleConnections()
 	return tempComments, nil
 }
+
+type ComResult struct {
+	comments []Comment
+	err      error
+}
+
+func getChargerCommentsAsync(commratAddr string, logger log.Logger, chargerID string, response chan ComResult) {
+	requestBody, err := json.Marshal(GetChargerCommentsRequest{})
+	tempResponse := GetChargerCommentsResponse{}
+	tempComments := []Comment{}
+	tempCR := ComResult{}
+	if err != nil {
+		tempCR.err = err
+		tempCR.comments = tempComments
+		response <- tempCR
+	}
+	client := &http.Client{}
+	commratUri := commratAddr + "/comments/"
+	req, err := http.NewRequest(http.MethodGet, commratUri+"?charger="+chargerID, bytes.NewBuffer(requestBody))
+	if err != nil {
+		tempCR.err = err
+		tempCR.comments = tempComments
+		response <- tempCR
+	}
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		tempCR.err = err
+		tempCR.comments = tempComments
+		response <- tempCR
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&tempResponse)
+
+	tempComments = tempResponse.Comments
+	if err != nil {
+		tempCR.err = err
+		tempCR.comments = tempComments
+		response <- tempCR
+	}
+	client.CloseIdleConnections()
+	tempCR.err = nil
+	tempCR.comments = tempComments
+	response <- tempCR
+}
 func getChargerReservations(reservationsAddr string, logger log.Logger, chargerID string) ([]Reservation, error) {
 	requestBody, err := json.Marshal(GetChargerReservationsRequest{})
 	tempResponse := GetChargerReservationsResponse{}
@@ -224,6 +374,52 @@ func getChargerReservations(reservationsAddr string, logger log.Logger, chargerI
 	}
 	client.CloseIdleConnections()
 	return tempReservations, nil
+}
+
+type ResResult struct {
+	reservations []Reservation
+	err          error
+}
+
+func getChargerReservationsAsync(reservationsAddr string, logger log.Logger, chargerID string, response chan ResResult) {
+	requestBody, err := json.Marshal(GetChargerReservationsRequest{})
+	tempResponse := GetChargerReservationsResponse{}
+	tempReservations := []Reservation{}
+	tempRR := ResResult{}
+	if err != nil {
+		tempRR.err = err
+		tempRR.reservations = tempReservations
+		response <- tempRR
+	}
+	client := &http.Client{}
+	reservationsUri := reservationsAddr + "/reservations/"
+	req, err := http.NewRequest(http.MethodGet, reservationsUri+"?charger="+chargerID, bytes.NewBuffer(requestBody))
+	if err != nil {
+		tempRR.err = err
+		tempRR.reservations = tempReservations
+		response <- tempRR
+	}
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		tempRR.err = err
+		tempRR.reservations = tempReservations
+		response <- tempRR
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&tempResponse)
+
+	tempReservations = tempResponse.Reservations
+	if err != nil {
+		tempRR.err = err
+		tempRR.reservations = tempReservations
+		response <- tempRR
+	}
+	client.CloseIdleConnections()
+	tempRR.err = nil
+	tempRR.reservations = tempReservations
+	response <- tempRR
 }
 func getConsulValue(consul consulapi.Client, logger log.Logger, key string) (string, error) {
 	kv := consul.KV()
