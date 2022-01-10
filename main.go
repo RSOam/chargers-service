@@ -76,7 +76,7 @@ func main() {
 
 	go func() {
 		fmt.Println("listening on port", *httpAddr)
-		handler := chargers.NewHttpServer(ctx2, endpoints)
+		handler := chargers.NewHttpServer(ctx2, endpoints, collection, *consulClient)
 		errs <- http.ListenAndServe(*httpAddr, handler)
 	}()
 	level.Error(logger).Log("exit", <-errs)

@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proxy-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /chargers
+            backend:
+              serviceName: chargers-service
+              servicePort: 8080
+          - path: /comments
+            backend:
+              serviceName: comments-and-ratings-service
+              servicePort: 8080    
+          - path: /ratings
+            backend:
+              serviceName: comments-and-ratings-service
+              servicePort: 8080
+          - path: /users
+            backend:
+              serviceName: users-service
+              servicePort: 8080     
+          - path: /reservations
+            backend:
+              serviceName: reservations-service
+              servicePort: 8080  
