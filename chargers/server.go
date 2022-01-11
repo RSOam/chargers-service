@@ -25,9 +25,9 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints, db *mongo.Database,
 	)
 	r.Use(cors)
 	health := healthcheck.NewHandler()
-	//health.AddLivenessCheck("goroutine-threshold", healthcheck.GoroutineCountCheck(100))
+	health.AddLivenessCheck("goroutine-threshold", healthcheck.GoroutineCountCheck(100))
 	health.AddReadinessCheck("database", DatabasePingCheck(db, 1*time.Second))
-	health.AddLivenessCheck("sick", simulateSick(consul))
+	//health.AddLivenessCheck("sick", simulateSick(consul))
 	r.Methods("POST").Path("/chargers").Handler(ht.NewServer(
 		endpoints.CreateCharger,
 		decodeCreateChargerRequest,

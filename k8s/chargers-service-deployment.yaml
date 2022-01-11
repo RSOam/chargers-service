@@ -13,7 +13,7 @@ spec:
         app: chargers-service
     spec:
       containers:
-        - image: almarkdev/chargers-service:2022-01-10-22-10-03
+        - image: almarkdev/chargers-service:2022-01-11-03-16-59
           name: chargers-service
           env:
           - name: HOST_IP
