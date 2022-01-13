@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -462,7 +463,9 @@ func callAPIs(location Location, logger log.Logger, consul consulapi.Client) (st
 	weaURL, _ := getConsulValue(consul, logger, "weatherAPIurl")
 	rapidKey, _ := getConsulValue(consul, logger, "rapidAPIkey")
 
-	url := "https://" + geoURL + "/v1/geo/locations/46.0569+14.5058/nearbyCities?radius=10"
+	lat := fmt.Sprintf("%f", location.Latitude)
+	long := fmt.Sprintf("%f", location.Longitude)
+	url := "https://" + geoURL + "/v1/geo/locations/" + lat + "+" + long + "/nearbyCities?radius=10"
 	tmpCond := weatherAPIcondition{}
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -482,7 +485,7 @@ func callAPIs(location Location, logger log.Logger, consul consulapi.Client) (st
 		return "", 0, tmpCond, err
 	}
 
-	url = "https://" + weaURL + "/current.json?q=46.0569%2C14.5058"
+	url = "https://" + weaURL + "/current.json?q=" + lat + "%2C" + long
 
 	req, _ = http.NewRequest("GET", url, nil)
 
