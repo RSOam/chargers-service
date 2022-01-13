@@ -27,7 +27,6 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints, db *mongo.Database,
 	health := healthcheck.NewHandler()
 	health.AddLivenessCheck("goroutine-threshold", healthcheck.GoroutineCountCheck(100))
 	health.AddReadinessCheck("database", DatabasePingCheck(db, 1*time.Second))
-	//health.AddLivenessCheck("sick", simulateSick(consul))
 	r.Methods("POST").Path("/chargers").Handler(ht.NewServer(
 		endpoints.CreateCharger,
 		decodeCreateChargerRequest,
@@ -74,19 +73,7 @@ func DatabasePingCheck(database *mongo.Database, timeout time.Duration) healthch
 		return database.Client().Ping(ctx, readpref.Primary())
 	}
 }
-func simulateSick(consul consulapi.Client) healthcheck.Check {
-	return func() error {
-		str, err := getConsulCheck(consul, "health")
-		if err != nil {
-			return err
-		}
-		if str != "true" {
-			return fmt.Errorf("service sick")
-		} else {
-			return nil
-		}
-	}
-}
+
 func getConsulCheck(consul consulapi.Client, key string) (string, error) {
 	kv := consul.KV()
 	keyPair, _, err := kv.Get(key, nil)
