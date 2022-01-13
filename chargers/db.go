@@ -80,14 +80,15 @@ func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error)
 }
 */
 
-func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error) {
+func (dat *database) GetCharger(ctx context.Context, id string) (Charger, ChargerExtra, error) {
 	//ASYNC
 	tempCharger := Charger{}
+	tempExtra := ChargerExtra{}
 	objectID, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
 		dat.logger.Log("Error getting charger from DB: ", err.Error())
-		return tempCharger, err
+		return tempCharger, tempExtra, err
 	}
 	ratChan := make(chan RatResult)
 	comChan := make(chan ComResult)
@@ -106,19 +107,19 @@ func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error)
 	dat.logger.Log("Async got chargers")
 	if ratRes.err != nil {
 		dat.logger.Log("Error getting charger from DB: ", ratRes.err.Error())
-		return tempCharger, ratRes.err
+		return tempCharger, tempExtra, ratRes.err
 	}
 	comRes := <-comChan
 	dat.logger.Log("Async got comments")
 	if err != nil {
 		dat.logger.Log("Error getting charger from DB: ", comRes.err.Error())
-		return tempCharger, comRes.err
+		return tempCharger, tempExtra, comRes.err
 	}
 	resRes := <-resChan
 	dat.logger.Log("Async got reservations")
 	if resRes.err != nil {
 		dat.logger.Log("Error getting charger from DB: ", resRes.err.Error())
-		return tempCharger, resRes.err
+		return tempCharger, tempExtra, resRes.err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -126,12 +127,16 @@ func (dat *database) GetCharger(ctx context.Context, id string) (Charger, error)
 	err = dat.db.Collection("Chargers").FindOne(ctx, bson.M{"_id": objectID}).Decode(&tempCharger)
 	if err != nil {
 		dat.logger.Log("Error getting charger from DB: ", err.Error())
-		return tempCharger, err
+		return tempCharger, tempExtra, err
 	}
+	city, temp, weather, err := callAPIs(tempCharger.Location, dat.logger, dat.consul)
 	tempCharger.Ratings = ratRes.ratings
 	tempCharger.Comments = comRes.comments
 	tempCharger.Reservations = resRes.reservations
-	return tempCharger, nil
+	tempExtra.City = city
+	tempExtra.Weather = weather
+	tempExtra.Temp = temp
+	return tempCharger, tempExtra, nil
 }
 
 func (dat *database) DeleteCharger(ctx context.Context, id string) error {
@@ -202,7 +207,7 @@ func getChargerRatings(commratAddr string, logger log.Logger, chargerID string) 
 		return tempRatings, err
 	}
 	client := &http.Client{}
-
+	commratAddr = "http://20.124.136.184:8080"
 	commratUri := commratAddr + "/ratings/"
 	req, err := http.NewRequest(http.MethodGet, commratUri+"?charger="+chargerID, bytes.NewBuffer(requestBody))
 	if err != nil {
@@ -429,4 +434,72 @@ func getConsulValue(consul consulapi.Client, logger log.Logger, key string) (str
 		return "", err
 	}
 	return string(keyPair.Value), nil
+}
+
+type geoAPI struct {
+	Data []geoAPIdata `json:"data"`
+}
+type geoAPIdata struct {
+	Name string `json:"name"`
+}
+
+type weatherAPI struct {
+	Current weatherAPIcurrent
+}
+
+type weatherAPIcurrent struct {
+	Temp      float64             `json:"temp_c"`
+	Condition weatherAPIcondition `json:"condition"`
+}
+type weatherAPIcondition struct {
+	Weather string `json:"text"`
+	Icon    string `json:"icon"`
+}
+
+func callAPIs(location Location, logger log.Logger, consul consulapi.Client) (string, float64, weatherAPIcondition, error) {
+
+	geoURL, _ := getConsulValue(consul, logger, "geoAPIurl")
+	weaURL, _ := getConsulValue(consul, logger, "weatherAPIurl")
+	rapidKey, _ := getConsulValue(consul, logger, "rapidAPIkey")
+
+	url := "https://" + geoURL + "/v1/geo/locations/46.0569+14.5058/nearbyCities?radius=10"
+	tmpCond := weatherAPIcondition{}
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Add("x-rapidapi-host", geoURL)
+	req.Header.Add("x-rapidapi-key", rapidKey)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		logger.Log("msg", "Problem getting Geo API")
+		return "", 0, tmpCond, err
+	}
+	defer res.Body.Close()
+	tmpGeo := geoAPI{}
+	err = json.NewDecoder(res.Body).Decode(&tmpGeo)
+	if err != nil {
+		logger.Log("msg", "Problem getting Geo API")
+		return "", 0, tmpCond, err
+	}
+
+	url = "https://" + weaURL + "/current.json?q=46.0569%2C14.5058"
+
+	req, _ = http.NewRequest("GET", url, nil)
+
+	req.Header.Add("x-rapidapi-host", weaURL)
+	req.Header.Add("x-rapidapi-key", rapidKey)
+
+	res, err = http.DefaultClient.Do(req)
+	if err != nil {
+		logger.Log("msg", "Problem getting Weather API")
+		return "", 0, tmpCond, err
+	}
+	defer res.Body.Close()
+	tmpWea := weatherAPI{}
+	err = json.NewDecoder(res.Body).Decode(&tmpWea)
+	if err != nil {
+		logger.Log("msg", "Problem getting Weather API")
+		return "", 0, tmpCond, err
+	}
+	return tmpGeo.Data[0].Name, tmpWea.Current.Temp, tmpWea.Current.Condition, nil
 }

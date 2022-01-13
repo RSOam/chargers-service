@@ -20,12 +20,15 @@ type (
 		Id string `json:"id"`
 	}
 	GetChargerResponse struct {
-		Name          string        `json:"name"`
-		Location      Location      `json:"location"`
-		AverageRating float64       `json:"averageRating"`
-		Ratings       []Rating      `json:"ratings"`
-		Comments      []Comment     `json:"comments"`
-		Reservations  []Reservation `json:"reservations"`
+		Name          string              `json:"name"`
+		Location      Location            `json:"location"`
+		AverageRating float64             `json:"averageRating"`
+		Ratings       []Rating            `json:"ratings"`
+		Comments      []Comment           `json:"comments"`
+		Reservations  []Reservation       `json:"reservations"`
+		ClosestCity   string              `json:"closestCity"`
+		Temperature   float64             `json:"temperature"`
+		Weather       weatherAPIcondition `json:"weather"`
 	}
 	GetChargersRequest struct {
 	}

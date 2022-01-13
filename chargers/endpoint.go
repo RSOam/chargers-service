@@ -34,7 +34,7 @@ func makeCreateChargerEndpoint(s ChargersService) endpoint.Endpoint {
 func makeGetChargerEndpoint(s ChargersService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetChargerRequest)
-		charger, err := s.GetCharger(ctx, req.Id)
+		charger, extra, err := s.GetCharger(ctx, req.Id)
 		return GetChargerResponse{
 			Name:          charger.Name,
 			Location:      charger.Location,
@@ -42,6 +42,9 @@ func makeGetChargerEndpoint(s ChargersService) endpoint.Endpoint {
 			Ratings:       charger.Ratings,
 			Comments:      charger.Comments,
 			Reservations:  charger.Reservations,
+			ClosestCity:   extra.City,
+			Temperature:   extra.Temp,
+			Weather:       extra.Weather,
 		}, err
 	}
 }

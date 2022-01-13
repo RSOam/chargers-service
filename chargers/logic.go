@@ -61,15 +61,15 @@ func (s service) UpdateCharger(ctx context.Context, id string, name string, loca
 	logger.Log("update Charger", nil)
 	return "Ok", nil
 }
-func (s service) GetCharger(ctx context.Context, id string) (Charger, error) {
+func (s service) GetCharger(ctx context.Context, id string) (Charger, ChargerExtra, error) {
 	logger := log.With(s.logger, "method", "GetCharger")
-	charger, err := s.db.GetCharger(ctx, id)
+	charger, extra, err := s.db.GetCharger(ctx, id)
 	if err != nil {
 		level.Error(logger).Log("err", err)
-		return charger, err
+		return charger, extra, err
 	}
 	logger.Log("Get Charger", id)
-	return charger, nil
+	return charger, extra, nil
 }
 func (s service) GetChargers(ctx context.Context) ([]Charger, error) {
 	logger := log.With(s.logger, "method", "GetChargers")

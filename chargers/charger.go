@@ -50,9 +50,14 @@ type Reservation struct {
 	Modified  string             `json:"modified"`
 }
 
+type ChargerExtra struct {
+	City    string              `json:"closestCity"`
+	Temp    float64             `json:"temp"`
+	Weather weatherAPIcondition `json:"weather"`
+}
 type ChargerDB interface {
 	CreateCharger(ctx context.Context, charger Charger) error
-	GetCharger(ctx context.Context, id string) (Charger, error)
+	GetCharger(ctx context.Context, id string) (Charger, ChargerExtra, error)
 	GetChargers(ctx context.Context) ([]Charger, error)
 	UpdateCharger(ctx context.Context, id string, charger Charger) error
 	DeleteCharger(ctx context.Context, id string) error
