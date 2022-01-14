@@ -7,6 +7,7 @@ import (
 	"time"
 
 	ht "github.com/go-kit/kit/transport/http"
+	openapi "github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	consulapi "github.com/hashicorp/consul/api"
@@ -27,6 +28,10 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints, db *mongo.Database,
 	health := healthcheck.NewHandler()
 	health.AddLivenessCheck("goroutine-threshold", healthcheck.GoroutineCountCheck(100))
 	health.AddReadinessCheck("database", DatabasePingCheck(db, 1*time.Second))
+
+	docOptionsSwaggerUI := openapi.SwaggerUIOpts{}
+	docsHandlerSwaggerUI := openapi.SwaggerUI(docOptionsSwaggerUI, nil)
+
 	r.Methods("POST").Path("/chargers").Handler(ht.NewServer(
 		endpoints.CreateCharger,
 		decodeCreateChargerRequest,
@@ -54,6 +59,10 @@ func NewHttpServer(ctx context.Context, endpoints Endpoints, db *mongo.Database,
 	))
 	r.HandleFunc("/health/live", health.LiveEndpoint)
 	r.HandleFunc("/health/ready", health.ReadyEndpoint)
+	r.Handle("/docs", docsHandlerSwaggerUI)
+	r.HandleFunc("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "swagger.json")
+	})
 	return r
 }
 

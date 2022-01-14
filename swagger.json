@@ -1,0 +1,1335 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "EChargers",
+    "description": "Echargers API\n",
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "http://52.149.199.210"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Charger",
+      "description": "Chargers service endpoints"
+    },
+    {
+      "name": "Comment",
+      "description": "Comments service endpoints"
+    },
+    {
+      "name": "Rating",
+      "description": "Ratings service endpoints"
+    },
+    {
+      "name": "Reservation",
+      "description": "Reservations service endpoints"
+    },
+    {
+      "name": "User",
+      "description": "User service endpoints"
+    }
+  ],
+  "paths": {
+    "/chargers": {
+      "get": {
+        "tags": [
+          "Charger"
+        ],
+        "summary": "Get all chargers",
+        "operationId": "getChargers",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/chargers/": {
+      "post": {
+        "tags": [
+          "Charger"
+        ],
+        "summary": "Create a charger",
+        "operationId": "postChargers",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ChargerCreate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/chargers/{chargerId}": {
+      "get": {
+        "tags": [
+          "Charger"
+        ],
+        "summary": "Find charger by Id",
+        "operationId": "getChargerById",
+        "parameters": [
+          {
+            "name": "chargerId",
+            "in": "path",
+            "description": "ID of charger to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Charger"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Charger"
+        ],
+        "summary": "Update charger",
+        "operationId": "putCharger",
+        "parameters": [
+          {
+            "name": "chargerId",
+            "in": "path",
+            "description": "ID of charger to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ChargerUpdate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Charger"
+        ],
+        "summary": "Delete charger",
+        "operationId": "deleteCharger",
+        "parameters": [
+          {
+            "name": "chargerId",
+            "in": "path",
+            "description": "ID of charger to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Get all comments",
+        "operationId": "getComments",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/comments/": {
+      "get": {
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Filter comments by charger and/or user id",
+        "operationId": "getCommentsFilter",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "charger",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Create a comments",
+        "operationId": "postComment",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CommentCreate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/comments/{commentId}": {
+      "get": {
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Find comment by Id",
+        "operationId": "getCommentById",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID of comment to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Update comment",
+        "operationId": "putComment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID of comment to update",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CommentUpdate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Delete comment",
+        "operationId": "deleteComment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID of comment to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/ratings": {
+      "get": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Get all ratings",
+        "operationId": "getRatings",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/ratings/": {
+      "get": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Filter ratings by charger and/or user id",
+        "operationId": "getRatingFilter",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "charger",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Create a ratings",
+        "operationId": "postRating",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RatingCreate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/ratings/{ratingId}": {
+      "get": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Find rating by Id",
+        "operationId": "getRatingById",
+        "parameters": [
+          {
+            "name": "ratingId",
+            "in": "path",
+            "description": "ID of rating to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rating"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Update rating",
+        "operationId": "putRating",
+        "parameters": [
+          {
+            "name": "ratingId",
+            "in": "path",
+            "description": "ID of rating to update",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RatingUpdate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Delete rating",
+        "operationId": "deleteRating",
+        "parameters": [
+          {
+            "name": "ratingId",
+            "in": "path",
+            "description": "ID of rating to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/reservations": {
+      "get": {
+        "tags": [
+          "Reservation"
+        ],
+        "summary": "Get all reservations",
+        "operationId": "getReservations",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/reservations/": {
+      "get": {
+        "tags": [
+          "Reservation"
+        ],
+        "summary": "Filter reservations by charger and/or user id",
+        "operationId": "getReservationFilter",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "charger",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Reservation"
+        ],
+        "summary": "Create a reservation",
+        "operationId": "postReservation",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ReservationCreate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/reservations/{reservationId}": {
+      "get": {
+        "tags": [
+          "Reservation"
+        ],
+        "summary": "Find reservation by Id",
+        "operationId": "getReservationById",
+        "parameters": [
+          {
+            "name": "reservationId",
+            "in": "path",
+            "description": "ID of reservation to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reservation"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Reservation"
+        ],
+        "summary": "Update reservation",
+        "operationId": "putReservation",
+        "parameters": [
+          {
+            "name": "reservationId",
+            "in": "path",
+            "description": "ID of reservation to update",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ReservationUpdate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Reservation"
+        ],
+        "summary": "Delete reservation",
+        "operationId": "deleteReservation",
+        "parameters": [
+          {
+            "name": "reservationId",
+            "in": "path",
+            "description": "ID of reservation to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get all users",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_4"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/users/": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Create a user",
+        "operationId": "postUsers",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UserCreate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Login as user",
+        "operationId": "loginUsers",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UserCreate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_5"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Find user by Id",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update user",
+        "operationId": "putUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UserUpdate"
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete user",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "500": {
+            "description": "Unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Charger": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "charger1"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Charger_location"
+          },
+          "averageRating": {
+            "type": "number"
+          },
+          "ratings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rating"
+            }
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          },
+          "reservations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reservation"
+            }
+          },
+          "closestCity": {
+            "type": "string"
+          },
+          "temperature": {
+            "type": "number"
+          },
+          "weather": {
+            "$ref": "#/components/schemas/Charger_weather"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          },
+          "ratings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rating"
+            }
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          },
+          "reservations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reservation"
+            }
+          }
+        }
+      },
+      "Rating": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chargerID": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "created": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chargerID": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          }
+        }
+      },
+      "Reservation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chargerID": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "chargers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Charger"
+            }
+          }
+        }
+      },
+      "inline_response_200_1": {
+        "type": "object",
+        "properties": {
+          "chargers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          }
+        }
+      },
+      "inline_response_200_2": {
+        "type": "object",
+        "properties": {
+          "chargers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rating"
+            }
+          }
+        }
+      },
+      "inline_response_200_3": {
+        "type": "object",
+        "properties": {
+          "chargers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reservation"
+            }
+          }
+        }
+      },
+      "inline_response_200_4": {
+        "type": "object",
+        "properties": {
+          "chargers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
+      "inline_response_200_5": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "Charger_location": {
+        "type": "object",
+        "properties": {
+          "longitude": {
+            "type": "number",
+            "format": "float64"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float64"
+          }
+        }
+      },
+      "Charger_weather": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "ChargerUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "averageRating": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReservationUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CommentUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RatingUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserUpdate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ChargerCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "object",
+                  "properties": {
+                    "longitude": {
+                      "type": "number",
+                      "format": "float64"
+                    },
+                    "latitude": {
+                      "type": "number",
+                      "format": "float64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CommentCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "chargerID": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RatingCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating": {
+                  "type": "string"
+                },
+                "chargerID": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReservationCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                },
+                "chargerID": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserCreate": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "JWTAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

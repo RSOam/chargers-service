@@ -4,7 +4,7 @@ RUN mkdir /chargers-service
 ADD . /chargers-service
 WORKDIR /chargers-service
 
-COPY go.mod go.sum ./
+COPY go.mod go.sum swagger.json ./
 RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
@@ -17,6 +17,7 @@ RUN mkdir /chargers-service
 
 WORKDIR /chargers-service/
 
+COPY --from=builder /chargers-service/swagger.json .
 COPY --from=builder /chargers-service/main .
 
 ARG DBpw_arg=default_value 

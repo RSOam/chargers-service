@@ -66,6 +66,13 @@ spec:
                 name: users-service
                 port: 
                   number: 8080
+          - path: /users/login
+            pathType: Prefix
+            backend:
+              service:
+                name: users-service
+                port: 
+                  number: 8080
           - path: /reservations
             pathType: Prefix
             backend:
