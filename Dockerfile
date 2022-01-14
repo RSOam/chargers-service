@@ -23,6 +23,6 @@ COPY --from=builder /chargers-service/main .
 ARG DBpw_arg=default_value 
 ENV DBpw=$DBpw_arg
 
-EXPOSE 8080
+EXPOSE 8080 50051
 
 CMD ["./main"]

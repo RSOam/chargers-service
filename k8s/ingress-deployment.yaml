@@ -10,6 +10,20 @@ spec:
   rules:
     - http:
         paths:
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: chargers-service
+                port: 
+                  number: 8080
+          - path: /swagger.json
+            pathType: Prefix
+            backend:
+              service:
+                name: chargers-service
+                port: 
+                  number: 8080
           - path: /chargers
             pathType: Prefix
             backend:

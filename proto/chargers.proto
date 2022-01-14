@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+option go_package = "/proto";
+
+service ChargersService {
+  rpc CreateCharger(CreateChargerRequest) returns (CreateChargerResponse) {}
+  rpc UpdateCharger(UpdateChargerRequest) returns (UpdateChargerResponse) {}
+  rpc DeleteCharger(DeleteChargerRequest) returns (DeleteChargerResponse) {}
+  rpc GetCharger(GetChargerRequest) returns (GetChargerResponse) {}
+  rpc GetChargers(GetChargersRequest) returns (GetChargersResponse) {}
+}
+
+message CreateChargerRequest {
+  string name = 1;
+  Location location = 2;
+}
+message CreateChargerResponse{
+  string status = 1;
+}
+message Location {
+  float longitude = 1;
+  float latitude = 2;
+}
+
+message UpdateChargerRequest{
+  string id = 1;
+  string name = 2;
+  Location location = 3;
+  float averageRating = 4;
+}
+message UpdateChargerResponse{
+  string status = 1;
+}
+
+message DeleteChargerRequest{
+  string id = 1;
+}
+message DeleteChargerResponse{
+  string status = 1;
+}
+
+message GetChargerRequest{
+  string id = 1;
+}
+message GetChargerResponse{
+  string name = 1;
+  Location location = 2;
+  float averageRating = 3;
+  repeated Rating ratings = 4;
+  repeated Comment comments = 5;
+  repeated Reservation reservations = 6;
+  string closestCity = 7;
+  float temperature = 8;
+  Weather weatheer = 9;
+}
+message Weather{
+  string weather = 1;
+  string icon = 2;
+}
+message Rating{
+  string id = 1;
+  string chargerID = 2;
+  string userID = 3;
+  int64 rating = 4;
+  string created = 5;
+  string modified = 6;
+}
+message Comment{
+  string id = 1;
+  string chargerID = 2;
+  string userID = 3;
+  string text = 4;
+  string created = 5;
+  string modified = 6;
+}
+message Reservation{
+  string id = 1;
+  string chargerID = 2;
+  string userID = 3;
+  string from = 4;
+  string to = 5;
+  string created = 6;
+  string modified = 7;
+}
+
+message GetChargersRequest{
+}
+message GetChargersResponse{
+  repeated Charger chargers = 1;
+}
+message Charger{
+  string name = 1;
+  Location location = 2;
+  float averageRating = 3;
+  repeated Rating ratings = 4;
+  repeated Comment comments = 5;
+  repeated Reservation reservations = 6;
+  string closestCity = 7;
+  float temperature = 8;
+  Weather weatheer = 9;
+}

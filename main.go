@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,11 +12,13 @@ import (
 	"time"
 
 	"github.com/RSOam/chargers-service/chargers"
+	"github.com/RSOam/chargers-service/proto"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	consulapi "github.com/hashicorp/consul/api"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -73,14 +76,26 @@ func main() {
 	}()
 
 	endpoints := chargers.MakeEndpoints(srv)
-
+	grpcServer := chargers.NewGRPCServer(endpoints, logger)
+	grpcListener, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		logger.Log("during", "Listen", "err", err)
+		os.Exit(1)
+	}
 	go func() {
 		fmt.Println("listening on port", *httpAddr)
 		handler := chargers.NewHttpServer(ctx2, endpoints, collection, *consulClient)
 		errs <- http.ListenAndServe(*httpAddr, handler)
 	}()
+	go func() {
+		baseServer := grpc.NewServer()
+		proto.RegisterChargersServiceServer(baseServer, grpcServer)
+		level.Info(logger).Log("msg", "Server started successfully 🚀")
+		baseServer.Serve(grpcListener)
+	}()
 	level.Error(logger).Log("exit", <-errs)
 }
+
 func test() string {
 	return "Ok"
 }
